@@ -1,58 +1,47 @@
-import { ArrowPathIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
-import Image from 'next/image';
-import { lusitana } from '@/app/ui/fonts';
-import { fetchLatestInvoices } from '@/app/lib/data'; // 🟢 On importe la fonction de data fetching
+"use client";
 
-export default async function LatestInvoices() { // 🟢 Plus de props
-  const latestInvoices = await fetchLatestInvoices(); // 🟢 On récupère les données ici
+import Image from "next/image";
 
+export type LatestInvoice = {
+  id: string;
+  name: string;
+  email: string;
+  amount: string;
+  image_url: string;
+};
+
+export default function LatestInvoices({
+  latestInvoices,
+}: {
+  latestInvoices: LatestInvoice[];
+}) {
   return (
-    <div className="flex w-full flex-col md:col-span-4">
-      <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
-        Latest Invoices
-      </h2>
-      <div className="flex grow flex-col justify-between rounded-xl bg-gray-50 p-4">
-        <div className="bg-white rounded-md p-4">
-          {latestInvoices.map((invoice, i) => (
-            <div
-              key={invoice.id}
-              className={clsx(
-                'flex flex-row items-center justify-between py-4',
-                { 'border-t border-gray-200': i !== 0 }
-              )}
-            >
-              <div className="flex items-center">
-                <Image
-                  src={invoice.image_url}
-                  alt={`${invoice.name}'s profile picture`}
-                  className="mr-4 rounded-full"
-                  width={32}
-                  height={32}
-                />
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold md:text-base">
-                    {invoice.name}
-                  </p>
-                  <p className="hidden text-sm text-gray-500 sm:block">
-                    {invoice.email}
-                  </p>
-                </div>
+    <div className="mt-6 w-full">
+      <h2 className="text-xl font-semibold mb-4">Latest Invoices</h2>
+      <ul className="space-y-3">
+        {latestInvoices.map((invoice) => (
+          <li
+            key={invoice.id}
+            className="flex items-center justify-between p-4 bg-white shadow rounded"
+          >
+            <div className="flex items-center gap-3">
+              <Image
+                src={invoice.image_url}
+                alt={invoice.name}
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <div>
+                <p className="font-medium">{invoice.name}</p>
+                <p className="text-sm text-gray-500">{invoice.email}</p>
               </div>
-              <p
-                className={`${lusitana.className} truncate text-sm font-medium md:text-base`}
-              >
-                {invoice.amount}
-              </p>
             </div>
-          ))}
-        </div>
 
-        <div className="flex items-center pb-2 pt-6">
-          <ArrowPathIcon className="h-5 w-5 text-gray-500" />
-          <h3 className="ml-2 text-sm text-gray-500">Updated just now</h3>
-        </div>
-      </div>
+            <span className="font-semibold">{invoice.amount}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
