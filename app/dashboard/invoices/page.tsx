@@ -1,6 +1,3 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
 import Table from '@/app/ui/invoices/table';
@@ -14,17 +11,10 @@ interface PageProps {
   searchParams?: { query?: string; page?: string };
 }
 
-export default function Page({ searchParams }: PageProps) {
+export default async function Page({ searchParams }: PageProps) {
   const query = searchParams?.query ?? '';
   const currentPage = Number(searchParams?.page ?? 1);
-  
-  const [totalPages, setTotalPages] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetchInvoicesPages(query).then(setTotalPages);
-  }, [query]);
-
-  if (totalPages === null) return <InvoicesTableSkeleton />; // loading
+  const totalPages = await fetchInvoicesPages(query);
 
   return (
     <div className="w-full">

@@ -1,22 +1,10 @@
 {
   "root": true,
-  "extends": [
-    "next/core-web-vitals",
-    "eslint:recommended",
-    "plugin:react/recommended"
-  ],
-  "plugins": ["react"],
-  "rules": {
-    "react/react-in-jsx-scope": "off"
-  },
+  "extends": [],
+  "rules": {},
   "env": {
     "browser": true,
     "node": true,
     "es2021": true
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
   }
 }
