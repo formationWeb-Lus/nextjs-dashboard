@@ -1,29 +1,50 @@
-'use client';
+// app/dashboard/invoices/page.tsx
+import Pagination from '@/app/ui/invoices/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/invoices/table';
+import { CreateInvoice } from '@/app/ui/invoices/buttons';
+import { lusitana } from '@/app/ui/fonts';
+import { Suspense } from 'react';
+import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import { fetchInvoicesPages } from '@/app/lib/data';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-interface SearchProps {
-  placeholder?: string;
-  initialQuery?: string;
+// Typage correct pour App Router
+interface PageProps {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
 }
 
-export default function Search({ placeholder, initialQuery = '' }: SearchProps) {
-  const [query, setQuery] = useState(initialQuery);
-  const router = useRouter();
+export default async function Page({ searchParams }: PageProps) {
+  const query = searchParams?.query ?? '';
+  const currentPage = Number(searchParams?.page ?? 1);
 
-  const handleSearch = () => {
-    router.push(`/dashboard/invoices?query=${encodeURIComponent(query)}&page=1`);
-  };
+  // fetch côté serveur
+  const totalPages = await fetchInvoicesPages(query);
 
   return (
-    <input
-      type="text"
-      placeholder={placeholder}
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-      className="border rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
-    />
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex w-full items-center justify-between">
+        <h1 className={`${lusitana.className} text-2xl`}>Invoices</h1>
+      </div>
+
+      {/* Search + Create */}
+      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+        <Search placeholder="Search invoices..." />
+        <CreateInvoice />
+      </div>
+
+      {/* Table with Suspense */}
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+        <Table query={query} currentPage={currentPage} />
+      </Suspense>
+
+      {/* Pagination */}
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
+      </div>
+    </div>
   );
 }
