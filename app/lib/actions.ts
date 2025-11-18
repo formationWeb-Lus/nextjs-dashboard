@@ -1,10 +1,10 @@
 'use server';
- 
+
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
- 
-// ...
- 
+
+/* --------------------------- AUTHENTICATION --------------------------- */
+
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
@@ -22,4 +22,19 @@ export async function authenticate(
     }
     throw error;
   }
+}
+
+/* --------------------------- CREATE INVOICE --------------------------- */
+
+export async function createInvoice(formData: FormData) {
+  const customerId = formData.get('customerId');
+  const amount = formData.get('amount');
+  const status = formData.get('status');
+
+  // TODO: Ajouter l'insertion en DB ici si tu veux
+  console.log("Invoice submitted:", { customerId, amount, status });
+
+  // Optionnel : redirection après succès
+  // revalidatePath('/dashboard/invoices');
+  // redirect('/dashboard/invoices');
 }

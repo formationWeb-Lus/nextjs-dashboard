@@ -1,11 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'invoices',
-};
 
 export default function Error({
   error,
