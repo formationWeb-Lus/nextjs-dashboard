@@ -1,50 +1,68 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
+import Pagination from '@/app/ui/invoices/pagination';
 import Table from '@/app/ui/invoices/table';
 import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import { fetchInvoicesPages } from '@/app/lib/data';
 
-interface Props {
-  searchParams?: { query?: string; page?: string };
-}
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
 
-export default function InvoicesPage({ searchParams }: Props) {
-  const query = searchParams?.query ?? '';
-  const currentPage = Number(searchParams?.page ?? 1);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
-  const [totalPages, setTotalPages] = useState<number | null>(null);
-
+  // Charger le nombre total de pages
   useEffect(() => {
-    async function fetchPages() {
+    async function loadPages() {
       try {
-        const res = await fetch(`/api/invoices/pages?query=${query}`);
-        const data = await res.json();
-        setTotalPages(data.totalPages);
-      } catch (err) {
-        console.error('Erreur API:', err);
+        const pages = await fetchInvoicesPages(query);
+        setTotalPages(pages);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
-
-    fetchPages();
+    loadPages();
   }, [query]);
 
-  if (totalPages === null) return <InvoicesTableSkeleton />;
+  if (loading) {
+    return (
+      <div className="p-6">
+        <InvoicesTableSkeleton />
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-4 flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
+    <div className="p-6 space-y-6">
+
+      {/* Barre de recherche */}
+      <div className="flex justify-between items-center">
         <Search placeholder="Search invoices..." />
         <CreateInvoice />
       </div>
 
+      {/* Tableau des invoices */}
       <Table query={query} currentPage={currentPage} />
 
-      <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <Pagination totalPages={totalPages} />
+        </div>
+      )}
     </div>
   );
 }
