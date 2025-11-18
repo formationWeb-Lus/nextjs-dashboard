@@ -1,6 +1,6 @@
 {
   "root": true,
-  "extends": [],
+  "extends": ["next/core-web-vitals", "eslint:recommended"],
   "rules": {},
   "env": {
     "browser": true,

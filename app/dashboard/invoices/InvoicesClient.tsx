@@ -1,4 +1,4 @@
-
+'use client';
 
 import { useState, useEffect } from 'react';
 import Pagination from '@/app/ui/invoices/pagination';
@@ -8,17 +8,17 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 
 interface Props {
-  searchParams?: { query?: string; page?: string };
+  query: string;
+  currentPage: number;
 }
 
-export default function InvoicesPage({ searchParams }: Props) {
-  const query = searchParams?.query ?? '';
-  const currentPage = Number(searchParams?.page ?? 1);
-
+export default function InvoicesClient({ query, currentPage }: Props) {
+  // On simule totalPages pour éviter l'appel direct à la DB côté client
   const [totalPages, setTotalPages] = useState<number | null>(null);
 
+  // Exemple de récupération via API Route côté serveur
   useEffect(() => {
-    async function fetchPages() {
+    async function fetchTotalPages() {
       try {
         const res = await fetch(`/api/invoices/pages?query=${query}`);
         const data = await res.json();
@@ -28,7 +28,7 @@ export default function InvoicesPage({ searchParams }: Props) {
       }
     }
 
-    fetchPages();
+    fetchTotalPages();
   }, [query]);
 
   if (totalPages === null) return <InvoicesTableSkeleton />;
