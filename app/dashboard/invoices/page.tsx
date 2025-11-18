@@ -1,4 +1,6 @@
-// app/dashboard/invoices/page.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
 import Table from '@/app/ui/invoices/table';
@@ -8,40 +10,37 @@ import { Suspense } from 'react';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { fetchInvoicesPages } from '@/app/lib/data';
 
-// Typage correct pour App Router
 interface PageProps {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
+  searchParams?: { query?: string; page?: string };
 }
 
-export default async function Page({ searchParams }: PageProps) {
+export default function Page({ searchParams }: PageProps) {
   const query = searchParams?.query ?? '';
   const currentPage = Number(searchParams?.page ?? 1);
+  
+  const [totalPages, setTotalPages] = useState<number | null>(null);
 
-  // fetch côté serveur
-  const totalPages = await fetchInvoicesPages(query);
+  useEffect(() => {
+    fetchInvoicesPages(query).then(setTotalPages);
+  }, [query]);
+
+  if (totalPages === null) return <InvoicesTableSkeleton />; // loading
 
   return (
     <div className="w-full">
-      {/* Header */}
       <div className="flex w-full items-center justify-between">
         <h1 className={`${lusitana.className} text-2xl`}>Invoices</h1>
       </div>
 
-      {/* Search + Create */}
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search invoices..." />
         <CreateInvoice />
       </div>
 
-      {/* Table with Suspense */}
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
         <Table query={query} currentPage={currentPage} />
       </Suspense>
 
-      {/* Pagination */}
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>
