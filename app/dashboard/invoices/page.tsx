@@ -21,7 +21,7 @@ export default async function Page({
   return (
     <div className="p-6 space-y-6">
 
-      {/* Barre de recherche */}
+     
       <div className="flex justify-between items-center">
         <Search placeholder="Search invoices..." />
         <CreateInvoice />
